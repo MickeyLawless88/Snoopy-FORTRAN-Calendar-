@@ -1,0 +1,347 @@
+                                                                         Page   1
+                                                                        01-01-80
+                                                                        06:50:59
+D Line# 1     7                            Microsoft FORTRAN77 V3.31 August 1985
+      1 $INCLUDE:'SNPPIC.FOR'
+      1         SUBROUTINE SNPPIC
+      2  
+      3         DIMENSION ILINE(133),INUM(50),ICHR(50)
+      4         COMMON ISET
+      5         DATA IBLNK/' '/
+      6  
+      7         DO 4 I=1,133
+1     8 4       ILINE(I)=IBLNK
+      9 5       K=1
+     10 10      READ (2,1000) (INUM(I),ICHR(I),I=1,ISET)
+     11         DO 40 I=1,ISET
+1    12            IF (INUM(I) .NE. -1) GOTO 100
+1    13  
+1    14 C     HERE WE WRITE A LINE TO THE PRINTER AND GO BUILD ANOTHER
+1    15  
+1    16            DO 15 L=K,133
+2    17 15         ILINE(L)=ICHR(I)
+1    18         WRITE (7,2000) (ILINE(K),K=1,133)
+1    19         ILINE(1)=IBLNK
+1    20         DO 20 K=2,133
+2    21 20      ILINE(K)=ICHR(I)
+1    22         K=1
+1    23 C error      I=I+1
+1    24 100     IF (INUM(I) .EQ. -2) GOTO 200
+1    25         IF (INUM(I) .EQ. 0) GOTO 40
+1    26         DO 30 J=1,INUM(I)
+2    27            ILINE(K)=ICHR(I)
+2    28            K=K+1
+2    29 30      CONTINUE
+1    30 40      CONTINUE
+     31         GOTO 10
+     32  
+     33 C     HERE WE EXIT THE PICTURE AND RETURN TO THE CALLING PROGRAM
+     34  
+     35 200     RETURN
+     36 C       FORMAT STATEMENTS
+     37 1000    FORMAT (25(I2,A1))
+     38 2000    FORMAT (133A1)
+     39  
+     40         END
+ 
+Name    Type        Offset P Class
+ 
+I      INTEGER*4       952    
+IBLNK  INTEGER*4       948    
+ICHR   INTEGER*4       748    
+ILINE  INTEGER*4        16    
+INUM   INTEGER*4       548    
+ISET   INTEGER*4         0   /COMMQQ/ 
+J      INTEGER*4       972    
+K      INTEGER*4       956    
+L      INTEGER*4       968    
+ 
+ 
+      2 C     SNOOPY CALENDAR PROGRAM
+                                                                         Page   2
+                                                                        01-01-80
+                                                                        06:50:59
+D Line# 1     7                            Microsoft FORTRAN77 V3.31 August 1985
+      3 C     -----------------------
+      4 C      PORTED FROM DEC PDP 11 FORTRAN SOURCE AND
+      5 C      TAKEN FROM A NON WORKING IBM FORTRAN VERSION
+      6 C      TO MICROSOFT FORTRAN VERSION 3.31, MISTAKES FIXED,
+      7 C      SYSTEM SPECIFIC CALLS/FEATURES OMITTED AND REPLACED
+      8 C      WITH ANSI COMPATIBLE FORTRAN. VERSION VERIFIED TO BE
+      9 C      WORKING AND EXECUTION OUTPUT IS AS DESIRED.
+     10 C
+     11 C      MICROSOFT FORTRAN VERSION / MODIFICATIONS BY:
+     12 C      MICKEY W. LAWLESS             OCTOBER 6, 2025
+     13 C      HOST SYSTEM OS: MS-DOS 6.22   CPU: NEC V-20
+     14 C
+     15 C      MAJOR ADDITIONS: A CRUDE ASCII PROGRESS BAR TO
+     16 C                       DISPLAY STATUS OF CALENDAR GENERATION.
+     17 C                       WHEN I INITIALLY RAN IT, IT SEEMED LIKE
+     18 C                       IT WASNT WORKING OR JUST HUNG UP, BUT THAT
+     19 C                       WASNT THE CASE, IT WAS READING THE FORMAT
+     20 C                       STATEMENTS AND VARIABLES TO GENERATE THE
+     21 C                       CALENDAR, BUT HAD NO OUTPUT. I ADDED THE
+     22 C                       PROGRESS BAR SO THE USER DOESNT PREMATURELY
+     23 C                       BREAK EXECUTION BEFORE CALENDAR GENERATION
+     24 C                       IS  COMPLETE.
+     25 C
+     26 C     COMPONENTS NEEDED ARE:
+     27 C       SNPCAL.FOR (THIS FILE)
+     28 C       SNPPIC.FOR - PICTURE DATA INTERPRETER
+     29 C          -or-
+     30 C       NULPIC.FOR - NULL PICTURE NON-INTERPRETER
+     31 C       SNPCAL.DAT - DATA FILE FOR PICTURES
+     32 C
+     33 C     OUTPUT PRODUCED:
+     34 C       SNPCAL.OUT - PRINTER IMAGE OF THE DESIRED CALENDAR
+     35 C
+     36 C     ******************************************************************
+     37 C     *                                                                *
+     38 C     * PRINTS CALENDAR, ONE MONTH PER PAGE WITH PICTURES OPTIONAL.    *
+     39 C     *                                                                *
+     40 C     * BEGINNING MONTH AND YEAR, ENDING MONTH AND YEAR MUST BE PRO-   *
+     41 C     * VIDED IN 4(I6)  FORMAT ON A CARD IMMEDIATELY FOLLOWING         *
+     42 C     * CARD 98 OF DECK.                                               *
+     43 C     *                                                                *
+     44 C     * IF GRID LINES ARE DESIRED, A 1 MUST APPEAR IN COLUMN 30 OF     *
+     45 C     * ABOVE CARD.  A BLANK OR ZERO WILL SUPPRESS GRID LINES.         *
+     46 C     *                                                                *
+     47 C     * ALL PICTURE DATA DECKS MUST BE TERMINATED WITH CODE -2.        *
+     48 C     * CONSECUTIVE -2*S WILL RESULT IN NO PICTURE BEING PRINTED       *
+     49 C     * FOR THAT MONTH.                                                *
+     50 C     *                                                                *
+     51 C     * PICTURE FORMAT CODES --                                        *
+     52 C     *    -1    END OF LINE                                           *
+     53 C     *    -2    END OF PICTURE                                        *
+     54 C     *    -3    LIST CARDS, ONE PER LINE, FORMAT 13A6                 *
+     55 C     *    -4    LIST CARDS, TWO PER LINE, FORMAT 11A6/11A6            *
+     56 C     *    -5    LIST CARDS, TWO PER LINE, FORMAT 12A6/10A6            *
+     57 C     *                                                                *
+     58 C     ******************************************************************
+                                                                         Page   3
+                                                                        01-01-80
+                                                                        06:50:59
+D Line# 1     7                            Microsoft FORTRAN77 V3.31 August 1985
+     59         REAL*8 AMONTH,ANAM,ANUM,CAL,BLANK,ONE,ALIN1,ALIN2,ALIN3,ALIN4
+     60         REAL*8 BAR
+     61         CHARACTER*1 HASH
+     62         DIMENSION AMONTH (12,7,13), ANAM(22), ANUM(2,10,5), NODS(12)
+     63         DIMENSION CAL(60,22), BAR(40)
+     64         COMMON ISET
+     65         DATA HASH/'#'/
+     66 C
+     67 C     OPEN FILES USING MS FORTRAN 3.31 SYNTAX
+     68 C
+     69         OPEN(2,FILE='SNPCAL.DAT',STATUS='OLD')
+     70         OPEN(7,FILE='SNPCAL.TXT',STATUS='NEW')
+     71 C
+     72         READ (2,1) (((AMONTH(I,J,K),K=1,13),J=1,7),I=1,12)
+     73         READ (2,2) (ANAM(I),I=1,22)
+     74         READ (2,3) (((ANUM(I,J,K),J=1,10),K=1,5),I=1,2)
+     75         READ (2,4) (NODS(I),I=1,12)
+     76         READ (2,1) BLANK,ONE,ALIN1,ALIN2,ALIN3,ALIN4
+     77         READ (2,4) MF,IYR,MTHLST,IYRLST,LNSW
+     78         ISET=25
+     79         DO 9 I=1,40
+1    80 9       BAR(I)=BLANK
+     81         DO 10 I=1,60
+1    82            DO 10 J=1,22
+2    83 10      CAL(I,J)= BLANK
+     84         CAL(1,1)= ONE
+     85         DO 20 J=1,22
+1    86 20      CAL(11,J)=ANAM(J)
+     87         IF (LNSW) 122,142,122
+     88 122     DO 125 I=20,60,8
+1    89            DO 125 J=1,22
+2    90 125     CAL(I,J)=ALIN2
+     91         DO 140 J=4,19,3
+1    92            I=13
+1    93 127        DO 130 L=1,7
+2    94               CAL(I,J)=ALIN1
+2    95 130        I=I+1
+1    96            IF (I-55) 135,135,140
+1    97 135        CAL(I,J)=ALIN3
+1    98            I=I+1
+1    99            GO TO 127
+1   100 140     CONTINUE
+    101         DO 141 I=20,60,8
+1   102 141     CAL(I,1)=ALIN4
+    103 142     IDOW=(IYR-1751)+(IYR-1753)/4-(IYR-1701)/100+(IYR-1601)/400
+    104         IDOW=IDOW-7*((IDOW-1)/7)
+    105 55      IF (IYR-IYRLST) 60,65,100
+    106 60      ML=12
+    107         GO TO 70
+    108 65      ML=MTHLST
+    109 70      IY1=IYR/1000
+    110         NUMB=IYR-1000*IY1
+    111         IY2=NUMB/100
+    112         NUMB=NUMB-100*IY2
+    113         IY3=NUMB/10
+    114         NUMB=NUMB-10*IY3
+                                                                         Page   4
+                                                                        01-01-80
+                                                                        06:50:59
+D Line# 1     7                            Microsoft FORTRAN77 V3.31 August 1985
+    115         IY4=NUMB
+    116         DO 72 J=1,5
+1   117            CAL(J+3,1)=ANUM(2,IY1+1,J)
+1   118            CAL(J+1,2)=ANUM(2,IY2+1,J)
+1   119            CAL(J+1,21)=ANUM(2,IY3+1,J)
+1   120 72      CAL(J+3,22)=ANUM(2,IY4+1,J)
+    121         LPYRSW=0
+    122         IF (IYR-4*(IYR/4)) 90,75,90
+    123 75      IF (IYR-100*(IYR/100)) 85,80,85
+    124 80      IF (IYR-400*(IYR/400)) 90,85,90
+    125 85      LPYRSW=1
+    126 90      NODS(2)=NODS(2)+LPYRSW
+    127         IF (MF-1) 100,110,95
+    128 95      MF=MF-1
+    129         DO 105 MONTH=1,MF
+1   130 105     IDOW=IDOW+NODS(MONTH)
+    131         IDOW=IDOW-7*((IDOW-1)/7)
+    132         MF=MF+1
+    133 110     DO 51 MONTH=MF,ML
+1   134            LSTDAY=NODS(MONTH)
+1   135            DO 115 I=1,7
+2   136               DO 115 JM=1,13
+3   137                  J=JM+4
+3   138 115       CAL(I,J)=AMONTH(MONTH,I,JM)
+1   139           IF (IDOW-1) 160,160,120
+1   140 120       ID=IDOW-1
+1   141           J=2
+1   142           DO 155 K=1,ID
+2   143              DO 150 I=14,18
+3   144                 CAL (I,J)= BLANK
+3   145 150          CAL(I,J+1)= BLANK
+2   146              J=J+3
+2   147 155       CONTINUE
+1   148 160       IDAY=1
+1   149           II=14
+1   150 25        J=3*IDOW-1
+1   151           N=IDAY/10+1
+1   152           I=II
+1   153           DO 30 K=1,5
+2   154              CAL(I,J)=ANUM(1,N,K)
+2   155 30        I=I+1
+1   156           N=IDAY-10*N+11
+1   157           J=J+1
+1   158           I=II
+1   159           DO 35 K=1,5
+2   160              CAL(I,J)=ANUM(2,N,K)
+2   161 35        I=I+1
+1   162           IDOW=IDOW+1
+1   163           IF (IDOW-7) 45,45,40
+1   164 40        IDOW=1
+1   165           II=II+8
+1   166 45        IDAY=IDAY+1
+1   167           IF (IDAY-LSTDAY) 25,25,50
+1   168 50        ID=IDOW
+1   169 205       I=II
+1   170           J=3*ID-1
+                                                                         Page   5
+                                                                        01-01-80
+                                                                        06:50:59
+D Line# 1     7                            Microsoft FORTRAN77 V3.31 August 1985
+1   171           DO 210 K=1,5
+2   172              CAL(I,J)= BLANK
+2   173              CAL(I,J+1)= BLANK
+2   174 210       I=I+1
+1   175           IF (ID-7) 215,220,220
+1   176 215       ID=ID+1
+1   177           GO TO 205
+1   178 220       IF (II-54) 225,230,230
+1   179 225       II=54
+1   180           ID=1
+1   181           GO TO 205
+1   182 230       CALL SNPPIC
+1   183           IYRST = IYR
+1   184           IF (MONTH.LT.MF) IYRST = IYR - 1
+1   185           NPAGES = (IYRLST-IYRST)*12 + MTHLST - MF + 1
+1   186           NPAGE = (IYR-IYRST)*12 + MONTH - MF + 1
+1   187           NPCT = (NPAGE * 100) / NPAGES
+1   188           NBAR = (NPAGE * 40) / NPAGES
+1   189           DO 231 I=1,NBAR
+2   190 231       BAR(I)=HASH
+1   191           WRITE (*,6) NPAGE,NPAGES,NPCT,(BAR(I),I=1,40)
+1   192           DO 232 I=1,NBAR
+2   193 232       BAR(I)=BLANK
+1   194           WRITE (7,5) ((CAL(I,J),J=1,22),I=1,60)
+1   195 51      CONTINUE
+    196         IF (IYR-IYRLST) 235,100,100
+    197 235     NODS(2)=NODS(2)-LPYRSW
+    198         IYR=IYR+1
+    199         MF=1
+    200         GO TO 55
+    201 100     CLOSE(2)
+    202         CLOSE(7)
+    203         STOP
+    204 1       FORMAT (13A6)
+    205 2       FORMAT (11A6)
+    206 3       FORMAT (10A6)
+    207 4       FORMAT (12I6)
+    208 5       FORMAT (22A6)
+    209 6       FORMAT ('+','[',I2,'/',I2,'] ',I3,'% [',40A1,']')
+    210  
+    211         END
+ 
+Name    Type        Offset P Class
+ 
+ALIN1  REAL*8        21734    
+ALIN2  REAL*8        21742    
+ALIN3  REAL*8        21750    
+ALIN4  REAL*8        21758    
+AMONTH REAL*8         1052    
+ANAM   REAL*8         9788    
+ANUM   REAL*8         9964    
+BAR    REAL*8        21372    
+BLANK  REAL*8        21718    
+CAL    REAL*8        10764    
+HASH   CHAR*1        21692    
+I      INTEGER*4     21694    
+                                                                         Page   6
+                                                                        01-01-80
+                                                                        06:50:59
+D Line# 1     7                            Microsoft FORTRAN77 V3.31 August 1985
+ID     INTEGER*4     21842    
+IDAY   INTEGER*4     21850    
+IDOW   INTEGER*4     21790    
+II     INTEGER*4     21854    
+ISET   INTEGER*4         0   /COMMQQ/ 
+IY1    INTEGER*4     21798    
+IY2    INTEGER*4     21806    
+IY3    INTEGER*4     21810    
+IY4    INTEGER*4     21814    
+IYR    INTEGER*4     21770    
+IYRLST INTEGER*4     21778    
+IYRST  INTEGER*4     21862    
+J      INTEGER*4     21698    
+JM     INTEGER*4     21838    
+K      INTEGER*4     21702    
+L      INTEGER*4     21786    
+LNSW   INTEGER*4     21782    
+LPYRSW INTEGER*4     21818    
+LSTDAY INTEGER*4     21834    
+MF     INTEGER*4     21766    
+ML     INTEGER*4     21794    
+MONTH  INTEGER*4     21822    
+MTHLST INTEGER*4     21774    
+N      INTEGER*4     21858    
+NBAR   INTEGER*4     21878    
+NODS   INTEGER*4     21324    
+NPAGE  INTEGER*4     21870    
+NPAGES INTEGER*4     21866    
+NPCT   INTEGER*4     21874    
+NUMB   INTEGER*4     21802    
+ONE    REAL*8        21726    
+ 
+ 
+ 
+Name    Type          Size   Class
+ 
+COMMQQ                   4   COMMON       
+MAIN                         PROGRAM      
+SNPPIC                       SUBROUTINE   
+ 
+ 
+ Pass One    No Errors Detected
+            211 Source Lines
