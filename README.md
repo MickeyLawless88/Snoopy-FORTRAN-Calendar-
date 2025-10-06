@@ -27,7 +27,7 @@ The modernization was carried out by **Mickey W. Lawless** in **October 2025**, 
 
 | Area | `snpcal-2.f` (Previous) | `SNOOPY.FOR` (Modified) |
 |------|--------------------------|---------------------------|
-| Language Standard | FORTRAN 77-style with full MS-DOS compatibility |
+| Language Standard | FORTRAN 77-style with full MS-DOS compatibility | Compatible with FORTRAN IV with minimal changes
 | I/O Syntax | Used `PRINT *`, stream-style output | Replaced with `WRITE` using classic FORMAT statements |
 | System Calls | None or unsupported modern syntax | Pure ANSI standard; compatible with 16-bit DOS compilers |
 | INCLUDE | Inline ASCII data | Modular `$INCLUDE:'SNPPIC.FOR'` for picture separation |
