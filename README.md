@@ -13,7 +13,7 @@ The modernization was carried out by **Mickey W. Lawless** in **October 2025**, 
 
 | Category | Description | Status |
 |-----------|--------------|---------|
-| ✅ Portability | Rewrote code to eliminate FORTRAN 2008 or non-ANSI constructs; fully compatible with Microsoft FORTRAN 3.31 | Complete |
+| ✅ Portability | Rewrote code to eliminate non standard subset 77 features non-ANSI constructs; fully compatible with Microsoft FORTRAN 3.31 | Complete |
 | ✅ Functionality | Repaired non-operational sections, corrected logic errors, ensured proper date and output generation | Complete |
 | ✅ Performance | Optimized calendar generation and output routines | Improved |
 | ✅ Readability | Reformatted and commented with consistent indentation and documentation headers | Enhanced |
@@ -27,7 +27,7 @@ The modernization was carried out by **Mickey W. Lawless** in **October 2025**, 
 
 | Area | `snpcal-2.f` (Previous) | `SNOOPY.FOR` (Modified) |
 |------|--------------------------|---------------------------|
-| Language Standard | FORTRAN 2008–style (modern extensions) | FORTRAN 77-style with full MS-DOS compatibility |
+| Language Standard | FORTRAN 77-style with full MS-DOS compatibility |
 | I/O Syntax | Used `PRINT *`, stream-style output | Replaced with `WRITE` using classic FORMAT statements |
 | System Calls | None or unsupported modern syntax | Pure ANSI standard; compatible with 16-bit DOS compilers |
 | INCLUDE | Inline ASCII data | Modular `$INCLUDE:'SNPPIC.FOR'` for picture separation |
@@ -80,7 +80,7 @@ Compared to the minimal or ambiguous header in `snpcal-2.f`, this version introd
 
 ### 5. Code Cleanups
 
-- Removed non-functional or experimental sections from `snpcal-2.f` (e.g., Fortran 2008 allocatable constructs, implicit none blocks).  
+- Removed non-functional or experimental sections from original version
 - Unified all variable declarations at the top of program blocks.  
 - Added inline comments clarifying purpose of major routines.  
 - Ensured compatibility with **fixed-form source format** (columns 7–72).  
